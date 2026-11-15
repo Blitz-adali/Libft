@@ -1,102 +1,69 @@
-*This activity has been created as part of the 42 curriculum by raaalali*  
+*This activity has been created as part of the 42 curriculum by raaalali.*
 
-# 🚀 Libft - Personal C Library  
+# Libft
 
-## 📄 Description  
-**Libft** is a personal static C library reimplementing 42 Next’s 43 mandatory functions. It helps understand low-level programming concepts such as memory management, string manipulation, character operations, and linked list data structures. The library is fully reusable in future 42 projects.  
+![C](https://img.shields.io/badge/language-C-A8B9CC?style=flat-square&logo=c&logoColor=black)
+![Norm](https://img.shields.io/badge/flags--Wall%20--Wextra%20--Werror-informational?style=flat-square)
+![Functions](https://img.shields.io/badge/functions-43-38bdf8?style=flat-square)
 
----
+A static C library that re-implements a core subset of libc and adds the string and list utilities the rest of my C projects build on. No external dependencies beyond `malloc`, `free` and `write`.
 
-## ⚙️ Compilation  
-- Compile library: `make` → generates `libft.a`  
-- Remove object files: `make clean`  
-- Remove objects + library: `make fclean`  
-- Recompile from scratch: `make re`  
+## Build
 
----
+```sh
+make          # builds libft.a
+make clean    # removes object files
+make fclean   # removes objects and libft.a
+make re       # full rebuild
+```
 
-## 💻 Usage  
-- Include header: `#include "libft.h"`  
-- Compile program with library: `gcc main.c libft.a -o main`  
+```sh
+cc main.c -L. -lft -o main
+```
 
----
+## API
 
-## 🧰 Library Overview  
-**43 functions** grouped into:  
-1. **Standard Library Functions**  
-2. **Additional Utility Functions**  
-3. **Linked List Functions**  
+### libc re-implementations
 
----
+| Memory | Strings | Characters & conversion |
+| --- | --- | --- |
+| `ft_memset` `ft_bzero` `ft_memcpy` `ft_memmove` `ft_memchr` `ft_memcmp` `ft_calloc` | `ft_strlen` `ft_strlcpy` `ft_strlcat` `ft_strchr` `ft_strrchr` `ft_strncmp` `ft_strnstr` `ft_strdup` | `ft_atoi` `ft_isalpha` `ft_isdigit` `ft_isalnum` `ft_isascii` `ft_isprint` `ft_toupper` `ft_tolower` |
 
-### 🧩 1. Standard Library Functions  
+### Additional utilities
 
-**Memory & String Manipulation:**  
-- 🟢 `ft_memset` — fill memory with a byte  
-- 🟢 `ft_bzero` — set memory bytes to zero  
-- 🟢 `ft_memcpy` — copy `n` bytes (non-overlapping)  
-- 🟢 `ft_memmove` — copy `n` bytes safely (handles overlap)  
-- 🟢 `ft_strlen` — get string length  
-- 🟢 `ft_strlcpy` — copy string into buffer safely  
-- 🟢 `ft_strlcat` — append string into buffer safely  
-- 🟢 `ft_strncmp` — compare strings up to `n` chars  
-- 🟢 `ft_strdup` — duplicate string with memory allocation  
+| Function | Purpose |
+| --- | --- |
+| `ft_substr` `ft_strjoin` `ft_strtrim` | Allocate new strings from slices, concatenations and trimmed input |
+| `ft_split` | Split on a delimiter into a `NULL`-terminated array, freeing everything on partial failure |
+| `ft_itoa` | Integer to string, including `INT_MIN` |
+| `ft_strmapi` `ft_striteri` | Apply a function per character, to a copy or in place |
+| `ft_putchar_fd` `ft_putstr_fd` `ft_putendl_fd` `ft_putnbr_fd` | Unbuffered output to any file descriptor |
 
-**Character & Conversion:**  
-- 🔵 `ft_atoi` — convert string to integer  
-- 🔵 `ft_isalpha` — check if alphabetic  
-- 🔵 `ft_isdigit` — check if digit  
-- 🔵 `ft_isalnum` — check if alphanumeric  
-- 🔵 `ft_isascii` — check if ASCII (0-127)  
-- 🔵 `ft_isprint` — check if printable  
-- 🔵 `ft_toupper` — convert lowercase → uppercase  
-- 🔵 `ft_tolower` — convert uppercase → lowercase  
+### Linked list
 
----
+```c
+typedef struct s_list
+{
+	void			*content;
+	struct s_list	*next;
+}	t_list;
+```
 
-### 🔧 2. Additional Utility Functions  
-- ✨ `ft_substr` — extract substring  
-- ✨ `ft_strjoin` — join two strings  
-- ✨ `ft_strtrim` — trim set of chars from start/end  
-- ✨ `ft_split` — split string by delimiter  
-- ✨ `ft_itoa` — int → string  
-- ✨ `ft_strmapi` — map function to each char (new string)  
-- ✨ `ft_striteri` — map function to each char (in-place)  
-- ✨ `ft_putchar_fd` — write char to file descriptor  
-- ✨ `ft_putstr_fd` — write string to fd  
-- ✨ `ft_putendl_fd` — write string + newline to fd  
-- ✨ `ft_putnbr_fd` — write integer as string to fd  
+`ft_lstnew` `ft_lstadd_front` `ft_lstadd_back` `ft_lstsize` `ft_lstlast` `ft_lstdelone` `ft_lstclear` `ft_lstiter` `ft_lstmap`
 
----
+`ft_lstmap` builds a new list and clears it with the caller's `del` if any allocation fails, so it never leaks on error.
 
-### 🔗 3. Linked List Functions  
-**t_list struct:**  
+## Design notes
 
-typedef struct s_list {
-    void *content;
-    struct s_list *next;
-} t_list;
+- Every allocating function returns `NULL` on failure and frees anything it allocated along the way.
+- `ft_memmove` handles overlapping regions by choosing copy direction; `ft_memcpy` does not, matching libc semantics.
+- `ft_strlcpy` / `ft_strlcat` return the length they tried to create, so callers can detect truncation.
 
-Functions:
+## Resources
 
-- 🟣 `ft_lstnew` — create new node
-- 🟣 `ft_lstadd_front` — add node at beginning
-- 🟣 `ft_lstadd_back` — add node at end
-- 🟣 `ft_lstsize` — return number of nodes
-- 🟣 `ft_lstlast` — return last node
-- 🟣 `ft_lstdelone` — delete a single node
-- 🟣 `ft_lstclear` — delete all nodes
-- 🟣 `ft_lstiter` — iterate and apply function to content
-- 🟣 `ft_lstmap` — map function to each node and create new list
+- 42 subject and `man 3` pages for each libc function
+- C standard library reference
 
-📚 Resources
+## AI usage
 
-    42 subject PDF / official docs
-
-    Linux man pages (man 3 function)
-
-    C Standard Library Reference
-
-🤖 AI Usage
-
-AI was used only to structure and polish this README. All source code was implemented, tested, and validated manually.
+AI was used only to structure and polish this README. All source code was implemented, tested and validated manually.
